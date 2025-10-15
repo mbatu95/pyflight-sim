@@ -20,10 +20,17 @@
 
     <main>
         <section class="simulation">
-            <h2>Plane Flight Animation</h2>
-            <p>This is a simple 3D simulation of a plane moving along a path.</p>
+            <h2>Airfoil Generator</h2>
 
-            <!-- 3D Canvas -->
+            <!-- Input controls -->
+            <div class="inputs">
+                <label>Max Camber (m): <input type="number" id="m" value="0.02" step="0.01"></label>
+                <label>Position of Max Camber (p): <input type="number" id="p" value="0.4" step="0.1"></label>
+                <label>Thickness (t): <input type="number" id="t" value="0.12" step="0.01"></label>
+                <button id="generateBtn">Generate Airfoil</button>
+            </div>
+
+            <!-- Three.js Canvas -->
             <div id="three-container" style="width: 100%; height: 600px;"></div>
         </section>
     </main>
@@ -32,8 +39,7 @@
         <p>© 2025 AeroViz 3D</p>
     </footer>
 
-    <!-- Three.js CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/three@0.150.1/build/three.min.js"></script>
-    <script src="js/main.js"></script>
+    <!-- Main JS as module -->
+    <script type="module" src="./js/main.js"></script>
 </body>
 </html>

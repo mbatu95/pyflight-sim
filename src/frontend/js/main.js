@@ -1,58 +1,43 @@
-// Grab container
-const container = document.getElementById('three-container');
+// main.js
+import * as THREE from 'https://unpkg.com/three@0.165.0/build/three.module.js';
+import { createControls } from './control.js';
+import { generateAirfoil } from './airfoil.js';
 
-// Scene setup
+// --- Scene setup ---
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x87ceeb); // sky blue
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+const renderer = new THREE.WebGLRenderer();
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.body.appendChild(renderer.domElement);
 
-// Camera
-const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
-camera.position.set(0, 5, 10);
+// --- Lighting ---
+const light = new THREE.DirectionalLight(0xffffff, 3);
+light.position.set(5, 5, 5);
+scene.add(light);
 
-// Renderer
-const renderer = new THREE.WebGLRenderer({ antialias: true });
-renderer.setSize(container.clientWidth, container.clientHeight);
-container.appendChild(renderer.domElement);
+// --- OrbitControls ---<script type="module" src="js/main.js"></script>
 
-// Lighting
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
-scene.add(ambientLight);
+const controls = createControls(camera, renderer);
+camera.position.set(0, 0, 3);
 
-const directionalLight = new THREE.DirectionalLight(0xffffff, 0.6);
-directionalLight.position.set(5, 10, 7.5);
-scene.add(directionalLight);
-
-// Plane geometry (placeholder)
-const planeGeometry = new THREE.BoxGeometry(1, 0.5, 2);
-const planeMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000 });
-const plane = new THREE.Mesh(planeGeometry, planeMaterial);
-scene.add(plane);
-
-// Flight path (circle for demo)
-const radius = 5;
-let angle = 0;
-
-// Resize handling
-window.addEventListener('resize', () => {
-    camera.aspect = container.clientWidth / container.clientHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(container.clientWidth, container.clientHeight);
+// --- Airfoil setup ---
+let airfoilMesh = null;
+document.getElementById("generateBtn").addEventListener("click", async () => {
+    if (airfoilMesh) scene.remove(airfoilMesh);
+    airfoilMesh = await generateAirfoil(scene);
 });
 
-// Animation loop
+// --- Animation loop ---
 function animate() {
     requestAnimationFrame(animate);
-
-    // Move plane along circular path
-    angle += 0.02; // speed
-    plane.position.x = radius * Math.cos(angle);
-    plane.position.z = radius * Math.sin(angle);
-    plane.position.y = 2 + Math.sin(angle * 2); // slight vertical motion
-
-    // Rotate plane to face direction
-    plane.rotation.y = -angle;
-
+    controls.update(); // important for damping
     renderer.render(scene, camera);
 }
-
 animate();
+
+// --- Responsive resize ---
+window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+});
